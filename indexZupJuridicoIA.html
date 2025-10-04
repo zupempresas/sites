@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zup Jurídico IA - Justiça mais rápida com inteligência artificial</title>
+
+    <!-- Ícone de Justiça + IA -->
+    <link rel="icon" href="data:image/svg+xml,
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>
+            <circle cx='32' cy='32' r='30' fill='%23336699'/>
+            <path d='M20 50 L20 30 H44 L44 50 Z' fill='%23fff'/>
+            <path d='M32 10 L28 20 H36 Z' fill='%23fff'/>
+            <circle cx='32' cy='32' r='4' fill='%23ffcc00'/>
+        </svg>" type="image/svg+xml">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'zup-blue': '#0A3D62',
+                        'zup-green': '#10B981',
+                        'zup-gray': '#E5E7EB',
+                        'zup-orange': '#F59E0B'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        .hidden { display: none; }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-white font-sans">
+    <!-- Header -->
+    <header class="bg-white shadow-md fixed w-full top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="w-8 h-8 md:w-10 md:h-10 bg-zup-blue rounded-lg flex items-center justify-center mr-2 md:mr-3">
+                    <span class="text-white font-bold text-sm md:text-lg">Z</span>
+                </div>
+                <span class="text-zup-blue font-bold text-lg md:text-xl">Zup Jurídico IA</span>
+            </div>
+            
+            <!-- Mobile menu button -->
+            <button id="mobileMenuBtn" class="md:hidden text-gray-700 hover:text-zup-blue" onclick="toggleMobileMenu()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            
+            <!-- Desktop navigation -->
+            <nav class="hidden md:flex space-x-8">
+                <a href="#home" class="text-gray-700 hover:text-zup-blue transition-colors">Home</a>
+                <a href="#funcionalidades" class="text-gray-700 hover:text-zup-blue transition-colors">Funcionalidades</a>
+                <a href="#precos" class="text-gray-700 hover:text-zup-blue transition-colors">Preços</a>
+                <a href="#contato" class="text-gray-700 hover:text-zup-blue transition-colors">Contato</a>
+            </nav>
+            
+            <!-- Desktop CTA button -->
+            <button onclick="showSection('cadastro')" class="hidden md:block bg-zup-orange text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors hover-scale">
+                Gerar Petição
+            </button>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t">
+            <nav class="px-4 py-4 space-y-4">
+                <a href="#home" class="block text-gray-700 hover:text-zup-blue transition-colors" onclick="toggleMobileMenu()">Home</a>
+                <a href="#funcionalidades" class="block text-gray-700 hover:text-zup-blue transition-colors" onclick="toggleMobileMenu()">Funcionalidades</a>
+                <a href="#precos" class="block text-gray-700 hover:text-zup-blue transition-colors" onclick="toggleMobileMenu()">Preços</a>
+                <a href="#contato" class="block text-gray-700 hover:text-zup-blue transition-colors" onclick="toggleMobileMenu()">Contato</a>
+                <button onclick="showSection('cadastro'); toggleMobileMenu();" class="w-full bg-zup-orange text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors">
+                    Gerar Petição
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="pt-20 bg-gradient-to-br from-zup-blue to-blue-800 text-white">
+        <div class="container mx-auto px-4 py-12 md:py-20">
+            <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+                <div class="text-center md:text-left">
+                    <h1 class="text-3xl md:text-5xl font-bold mb-4 md:mb-6">Justiça mais rápida com inteligência artificial</h1>
+                    <p class="text-lg md:text-xl mb-6 md:mb-8 text-blue-100">Automatize petições e soluções jurídicas para causas até R$ 15.000. Tecnologia avançada para cidadãos e profissionais do direito.</p>
+                    <button onclick="showSection('cadastro')" class="bg-zup-orange text-white px-6 md:px-8 py-3 md:py-4 rounded-lg text-base md:text-lg hover:bg-orange-600 transition-colors hover-scale w-full md:w-auto">
+                        Gerar Petição Agora
+                    </button>
+                </div>
+                <div class="text-center mt-8 md:mt-0">
+                    <svg class="w-64 h-64 md:w-96 md:h-96 mx-auto" viewBox="0 0 400 400" fill="none">
+                        <circle cx="200" cy="200" r="180" fill="#10B981" opacity="0.1"/>
+                        <rect x="120" y="120" width="160" height="200" rx="20" fill="#FFFFFF" opacity="0.9"/>
+                        <rect x="140" y="140" width="120" height="8" rx="4" fill="#0A3D62"/>
+                        <rect x="140" y="160" width="100" height="6" rx="3" fill="#E5E7EB"/>
+                        <rect x="140" y="180" width="110" height="6" rx="3" fill="#E5E7EB"/>
+                        <rect x="140" y="200" width="90" height="6" rx="3" fill="#E5E7EB"/>
+                        <circle cx="200" cy="250" r="30" fill="#10B981"/>
+                        <path d="M185 250 L195 260 L215 240" stroke="white" stroke-width="3" fill="none"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cadastro/Login Section -->
+    <section id="cadastro" class="hidden py-12 md:py-20 bg-zup-gray">
+        <div class="container mx-auto px-4 md:px-6">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6 md:p-8">
+                <h2 class="text-2xl md:text-3xl font-bold text-zup-blue mb-6 md:mb-8 text-center">Acesse sua conta</h2>
+                
+                <!-- Google Login Button -->
+                <button onclick="handleGoogleLogin()" class="w-full bg-white border-2 border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors mb-4 flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Continuar com Google
+                </button>
+                
+                <div class="flex items-center my-6">
+                    <div class="flex-1 border-t border-gray-300"></div>
+                    <span class="px-4 text-gray-500 text-sm">ou</span>
+                    <div class="flex-1 border-t border-gray-300"></div>
+                </div>
+                
+                <div class="mb-6">
+                    <div class="flex border-b">
+                        <button id="loginTab" onclick="showTab('login')" class="flex-1 py-3 text-center border-b-2 border-zup-orange text-zup-orange font-semibold text-sm md:text-base">
+                            Login
+                        </button>
+                        <button id="cadastroTab" onclick="showTab('cadastro')" class="flex-1 py-3 text-center text-gray-500 text-sm md:text-base">
+                            Cadastro
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">E-mail</label>
+                        <input type="email" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-zup-blue text-sm md:text-base">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Senha</label>
+                        <input type="password" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-zup-blue text-sm md:text-base">
+                    </div>
+                    <button type="submit" class="w-full bg-zup-orange text-white py-3 rounded-lg hover:bg-orange-600 transition-colors text-sm md:text-base">
+                        Continuar para gerar petição
+                    </button>
+                </form>
+
+                <!-- Cadastro Form -->
+                <form id="cadastroForm" class="hidden" onsubmit="handleCadastro(event)">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Nome Completo</label>
+                        <input type="text" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-zup-blue text-sm md:text-base">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">E-mail</label>
+                        <input type="email" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-zup-blue text-sm md:text-base">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Senha</label>
+                        <input type="password" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-zup-blue text-sm md:text-base">
+                    </div>
+                    <button type="submit" class="w-full bg-zup-orange text-white py-3 rounded-lg hover:bg-orange-600 transition-colors text-sm md:text-base">
+                        Criar conta e continuar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Formulário de Petição -->
+    <section id="peticao" class="hidden py-12 md:py-20 bg-white">
+        <div class="container mx-auto px-4 md:px-6">
+            <div class="max-w-2xl mx-auto">
+                <h2 class="text-2xl md:text-3xl font-bold text-zup-blue mb-6 md:mb-8 text-center">Gerar Petição</h2>
+                <div class="bg-white rounded-lg shadow-lg p-6 md:p-8">
+                    <form onsubmit="handlePeticao(event)">
+                        <div class="grid md:grid-cols-2 gap-4 md:gap-6 mb-6">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Tipo de Ação</label>
+                                <select required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-zup-blue text-sm md:text-base">
+                                    <option value="">Selecione...</option>
+                                    <option value="cobranca">Cobrança</option>
+                                    <option value="danos">Danos Morais</option>
+                                    <option value="trabalhista">Trabalhista</option>
+                                    <option value="consumidor">Direito do Consumidor</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Valor da Causa (R$)</label>
+                                <input type="number" max="15000" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-zup-blue text-sm md:text-base">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4 md:mb-6">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Parte Requerente</label>
+                            <input type="text" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-zup-blue text-sm md:text-base">
+                        </div>
+                        
+                        <div class="mb-4 md:mb-6">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Parte Requerida</label>
+                            <input type="text" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-zup-blue text-sm md:text-base">
+                        </div>
+                        
+                        <div class="mb-6 md:mb-8">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Resumo do Caso</label>
+                            <textarea rows="4" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-zup-blue text-sm md:text-base" placeholder="Descreva os fatos principais do seu caso..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-zup-orange text-white py-3 rounded-lg hover:bg-orange-600 transition-colors text-base md:text-lg">
+                            Gerar Petição
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pagamento PIX -->
+    <section id="pagamento" class="hidden py-12 md:py-20 bg-zup-gray">
+        <div class="container mx-auto px-4 md:px-6">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6 md:p-8 text-center">
+                <h2 class="text-2xl md:text-3xl font-bold text-zup-blue mb-4 md:mb-6">Pagamento via PIX</h2>
+                <div class="mb-6">
+                    <p class="text-gray-600 mb-4 text-sm md:text-base">Valor da petição:</p>
+                    <p class="text-2xl md:text-3xl font-bold text-zup-green">R$ 89,90</p>
+                </div>
+                
+                <div class="mb-6 md:mb-8">
+                    <div class="w-40 h-40 md:w-48 md:h-48 mx-auto bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                        <svg class="w-24 h-24 md:w-32 md:h-32" viewBox="0 0 200 200" fill="none">
+                            <rect x="20" y="20" width="160" height="160" fill="#000000"/>
+                            <rect x="30" y="30" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="60" y="30" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="90" y="30" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="120" y="30" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="150" y="30" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="30" y="60" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="90" y="60" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="150" y="60" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="30" y="90" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="60" y="90" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="120" y="90" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="150" y="90" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="30" y="120" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="90" y="120" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="150" y="120" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="30" y="150" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="60" y="150" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="90" y="150" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="120" y="150" width="20" height="20" fill="#FFFFFF"/>
+                            <rect x="150" y="150" width="20" height="20" fill="#FFFFFF"/>
+                        </svg>
+                    </div>
+                    <p class="text-xs md:text-sm text-gray-500 mt-2">Escaneie o QR Code com seu app do banco</p>
+                </div>
+                
+                <button onclick="confirmarPagamento()" class="w-full bg-zup-green text-white py-3 rounded-lg hover:bg-green-600 transition-colors mb-4 text-sm md:text-base">
+                    Confirmar Pagamento e Baixar Petição
+                </button>
+                
+                <p class="text-xs text-gray-500">Pagamento seguro via PIX</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="hidden py-12 md:py-20 bg-white">
+        <div class="container mx-auto px-4 md:px-6">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6 md:p-8 text-center">
+                <div class="w-12 h-12 md:w-16 md:h-16 bg-zup-green rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+                    <svg class="w-6 h-6 md:w-8 md:h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-bold text-zup-blue mb-4">Pagamento Confirmado!</h2>
+                <p class="text-gray-600 mb-6 md:mb-8 text-sm md:text-base">Sua petição foi gerada com sucesso e está pronta para download.</p>
+                
+                <div class="space-y-3 md:space-y-4">
+                    <button onclick="downloadFile('pdf')" class="w-full bg-zup-orange text-white py-3 rounded-lg hover:bg-orange-600 transition-colors text-sm md:text-base">
+                        📄 Baixar em PDF
+                    </button>
+                    <button onclick="downloadFile('docx')" class="w-full bg-zup-blue text-white py-3 rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base">
+                        📝 Baixar em DOCX
+                    </button>
+                </div>
+                
+                <button onclick="showSection('home')" class="mt-4 md:mt-6 text-zup-blue hover:underline text-sm md:text-base">
+                    Voltar ao início
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Funcionalidades -->
+    <section id="funcionalidades" class="py-12 md:py-20 bg-white">
+        <div class="container mx-auto px-4 md:px-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-zup-blue mb-12 md:mb-16">Funcionalidades</h2>
+            <div class="grid md:grid-cols-3 gap-6 md:gap-8">
+                <div class="text-center p-4 md:p-6 rounded-lg hover:shadow-lg transition-shadow">
+                    <div class="w-12 h-12 md:w-16 md:h-16 bg-zup-green rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                        <span class="text-xl md:text-2xl">⚡</span>
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold text-zup-blue mb-2">Geração Automática</h3>
+                    <p class="text-gray-600 text-sm md:text-base">Petições criadas automaticamente com IA avançada</p>
+                </div>
+                
+                <div class="text-center p-4 md:p-6 rounded-lg hover:shadow-lg transition-shadow">
+                    <div class="w-12 h-12 md:w-16 md:h-16 bg-zup-green rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                        <span class="text-xl md:text-2xl">📚</span>
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold text-zup-blue mb-2">Biblioteca Inteligente</h3>
+                    <p class="text-gray-600 text-sm md:text-base">Modelos jurídicos atualizados e personalizáveis</p>
+                </div>
+                
+                <div class="text-center p-4 md:p-6 rounded-lg hover:shadow-lg transition-shadow">
+                    <div class="w-12 h-12 md:w-16 md:h-16 bg-zup-green rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                        <span class="text-xl md:text-2xl">🤖</span>
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold text-zup-blue mb-2">Assistente IA</h3>
+                    <p class="text-gray-600 text-sm md:text-base">Chat inteligente para tirar dúvidas jurídicas</p>
+                </div>
+                
+                <div class="text-center p-4 md:p-6 rounded-lg hover:shadow-lg transition-shadow">
+                    <div class="w-12 h-12 md:w-16 md:h-16 bg-zup-green rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                        <span class="text-xl md:text-2xl">🔍</span>
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold text-zup-blue mb-2">Revisão Automática</h3>
+                    <p class="text-gray-600 text-sm md:text-base">Verificação inteligente de documentos</p>
+                </div>
+                
+                <div class="text-center p-4 md:p-6 rounded-lg hover:shadow-lg transition-shadow">
+                    <div class="w-12 h-12 md:w-16 md:h-16 bg-zup-green rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                        <span class="text-xl md:text-2xl">✅</span>
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold text-zup-blue mb-2">Checklist Processual</h3>
+                    <p class="text-gray-600 text-sm md:text-base">Guia completo para protocolo de ações</p>
+                </div>
+                
+                <div class="text-center p-4 md:p-6 rounded-lg hover:shadow-lg transition-shadow">
+                    <div class="w-12 h-12 md:w-16 md:h-16 bg-zup-green rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                        <span class="text-xl md:text-2xl">📋</span>
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold text-zup-blue mb-2">Histórico</h3>
+                    <p class="text-gray-600 text-sm md:text-base">Acesso a todos os documentos gerados</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefícios -->
+    <section class="py-12 md:py-20 bg-zup-gray">
+        <div class="container mx-auto px-4 md:px-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-zup-blue mb-12 md:mb-16">Por que escolher o Zup Jurídico IA?</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 md:w-20 md:h-20 bg-zup-orange rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+                        <span class="text-2xl md:text-3xl">🚀</span>
+                    </div>
+                    <h3 class="text-xl md:text-2xl font-bold text-zup-blue mb-3 md:mb-4">Agilidade</h3>
+                    <p class="text-gray-600 text-sm md:text-base">Petições geradas em minutos, não em horas</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 md:w-20 md:h-20 bg-zup-orange rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+                        <span class="text-2xl md:text-3xl">🔒</span>
+                    </div>
+                    <h3 class="text-xl md:text-2xl font-bold text-zup-blue mb-3 md:mb-4">Segurança</h3>
+                    <p class="text-gray-600 text-sm md:text-base">Dados protegidos com criptografia avançada</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 md:w-20 md:h-20 bg-zup-orange rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+                        <span class="text-2xl md:text-3xl">💡</span>
+                    </div>
+                    <h3 class="text-xl md:text-2xl font-bold text-zup-blue mb-3 md:mb-4">Facilidade</h3>
+                    <p class="text-gray-600 text-sm md:text-base">Interface intuitiva para todos os usuários</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Depoimentos -->
+    <section class="py-12 md:py-20 bg-white">
+        <div class="container mx-auto px-4 md:px-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-zup-blue mb-12 md:mb-16">O que nossos usuários dizem</h2>
+            <div class="grid md:grid-cols-3 gap-6 md:gap-8">
+                <div class="bg-white p-4 md:p-6 rounded-lg shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 md:w-12 md:h-12 bg-zup-green rounded-full flex items-center justify-center mr-3 md:mr-4">
+                            <span class="text-white font-bold text-sm md:text-base">M</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-zup-blue text-sm md:text-base">Maria Silva</h4>
+                            <p class="text-xs md:text-sm text-gray-500">Cidadã</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm md:text-base">"Consegui resolver meu problema trabalhista em poucos minutos. Incrível!"</p>
+                </div>
+                
+                <div class="bg-white p-4 md:p-6 rounded-lg shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 md:w-12 md:h-12 bg-zup-green rounded-full flex items-center justify-center mr-3 md:mr-4">
+                            <span class="text-white font-bold text-sm md:text-base">J</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-zup-blue text-sm md:text-base">João Santos</h4>
+                            <p class="text-xs md:text-sm text-gray-500">Advogado</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm md:text-base">"Economizo horas de trabalho com a qualidade que meus clientes merecem."</p>
+                </div>
+                
+                <div class="bg-white p-4 md:p-6 rounded-lg shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 md:w-12 md:h-12 bg-zup-green rounded-full flex items-center justify-center mr-3 md:mr-4">
+                            <span class="text-white font-bold text-sm md:text-base">A</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-zup-blue text-sm md:text-base">Ana Costa</h4>
+                            <p class="text-xs md:text-sm text-gray-500">Empresária</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm md:text-base">"Plataforma intuitiva e resultados profissionais. Recomendo!"</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="py-12 md:py-20 bg-gradient-to-r from-zup-blue to-blue-800 text-white">
+        <div class="container mx-auto px-4 md:px-6 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 md:mb-6">Pronto para automatizar suas petições?</h2>
+            <p class="text-lg md:text-xl mb-6 md:mb-8 text-blue-100">Junte-se a milhares de usuários que já confiam no Zup Jurídico IA</p>
+            <button onclick="showSection('cadastro')" class="bg-zup-orange text-white px-8 md:px-12 py-3 md:py-4 rounded-lg text-lg md:text-xl hover:bg-orange-600 transition-colors hover-scale w-full md:w-auto">
+                Gerar Petição Agora
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-zup-blue text-white py-8 md:py-12">
+        <div class="container mx-auto px-4 md:px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8">
+                <div class="text-center md:text-left">
+                    <div class="flex items-center justify-center md:justify-start mb-4">
+                        <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-2">
+                            <span class="text-zup-blue font-bold text-sm">Z</span>
+                        </div>
+                        <span class="font-bold text-base md:text-lg">Zup Jurídico IA</span>
+                    </div>
+                    <p class="text-blue-200 text-sm md:text-base">Justiça mais rápida com inteligência artificial</p>
+                </div>
+                
+                <div class="text-center md:text-left">
+                    <h4 class="font-bold mb-3 md:mb-4 text-sm md:text-base">Links Legais</h4>
+                    <ul class="space-y-2 text-blue-200 text-sm md:text-base">
+                        <li><a href="#" class="hover:text-white">Termos de Uso</a></li>
+                        <li><a href="#" class="hover:text-white">Política de Privacidade</a></li>
+                        <li><a href="#" class="hover:text-white">LGPD</a></li>
+                    </ul>
+                </div>
+                
+                <div class="text-center md:text-left">
+                    <h4 class="font-bold mb-3 md:mb-4 text-sm md:text-base">Contato</h4>
+                    <ul class="space-y-2 text-blue-200 text-sm md:text-base">
+                        <li>📧 contato@zupjuridico.com.br</li>
+                        <li>📱 (61) 98110-5902</li>
+                        <li>📍 Brasília, DF</li>
+                    </ul>
+                </div>
+                
+                <div class="text-center md:text-left">
+                    <h4 class="font-bold mb-3 md:mb-4 text-sm md:text-base">Redes Sociais</h4>
+                    <div class="flex space-x-4 justify-center md:justify-start">
+                        <a href="#" class="text-blue-200 hover:text-white text-xl md:text-2xl">📘</a>
+                        <a href="#" class="text-blue-200 hover:text-white text-xl md:text-2xl">📷</a>
+                        <a href="#" class="text-blue-200 hover:text-white text-xl md:text-2xl">🐦</a>
+                        <a href="#" class="text-blue-200 hover:text-white text-xl md:text-2xl">💼</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-blue-700 mt-6 md:mt-8 pt-6 md:pt-8 text-center text-blue-200">
+                <p class="text-xs md:text-sm">&copy; 2024 Zup Jurídico IA. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = ['home', 'cadastro', 'peticao', 'pagamento', 'download'];
+            sections.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.classList.add('hidden');
+                }
+            });
+            
+            // Show target section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                targetSection.classList.add('fade-in');
+                targetSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function showTab(tabName) {
+            const loginTab = document.getElementById('loginTab');
+            const cadastroTab = document.getElementById('cadastroTab');
+            const loginForm = document.getElementById('loginForm');
+            const cadastroForm = document.getElementById('cadastroForm');
+            
+            if (tabName === 'login') {
+                loginTab.classList.add('border-zup-orange', 'text-zup-orange', 'font-semibold');
+                loginTab.classList.remove('text-gray-500');
+                cadastroTab.classList.add('text-gray-500');
+                cadastroTab.classList.remove('border-zup-orange', 'text-zup-orange', 'font-semibold');
+                loginForm.classList.remove('hidden');
+                cadastroForm.classList.add('hidden');
+            } else {
+                cadastroTab.classList.add('border-zup-orange', 'text-zup-orange', 'font-semibold');
+                cadastroTab.classList.remove('text-gray-500');
+                loginTab.classList.add('text-gray-500');
+                loginTab.classList.remove('border-zup-orange', 'text-zup-orange', 'font-semibold');
+                cadastroForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+            }
+        }
+
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        function handleGoogleLogin() {
+            // Simulate Google login process
+            alert('Login com Google simulado com sucesso!');
+            showSection('peticao');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            showSection('peticao');
+        }
+
+        function handleCadastro(event) {
+            event.preventDefault();
+            showSection('peticao');
+        }
+
+        function handlePeticao(event) {
+            event.preventDefault();
+            showSection('pagamento');
+        }
+
+        function confirmarPagamento() {
+            showSection('download');
+        }
+
+        function downloadFile(format) {
+            // Create a sample document content
+            const content = format === 'pdf' ? 
+                'Petição Inicial - Gerada pelo Zup Jurídico IA\n\nEste é um documento de exemplo.' :
+                'Petição Inicial - Gerada pelo Zup Jurídico IA\n\nEste é um documento de exemplo em formato DOCX.';
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `peticao_zup_juridico.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98909c70a6d5caee',t:'MTc1OTUzODI1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
