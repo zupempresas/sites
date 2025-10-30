@@ -1,0 +1,888 @@
+<!doctype html>
+<html lang="pt-BR">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenHouse - Sistema Imobiliário Completo</title>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #003F5C 0%, #2C5F7C 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .chat-bubble {
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .modal {
+            backdrop-filter: blur(10px);
+        }
+        
+        .property-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .property-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+ </head>
+ <body class="bg-gray-50 min-h-full"><!-- Header -->
+  <header class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+   <div class="container mx-auto px-4 py-4">
+    <div class="flex items-center justify-between">
+     <div class="flex items-center space-x-3"><i class="fas fa-home text-2xl text-orange-400"></i>
+      <h1 id="company-name" class="text-2xl font-bold">OpenHouse</h1>
+     </div>
+     <nav class="hidden md:flex space-x-6"><button onclick="showSection('home')" class="hover:text-orange-400 transition-colors">Início</button> <button onclick="showSection('properties')" class="hover:text-orange-400 transition-colors">Imóveis</button> <button onclick="showSection('broker')" class="hover:text-orange-400 transition-colors">Painel Corretor</button> <button onclick="showSection('simulator')" class="hover:text-orange-400 transition-colors">Simulador</button>
+     </nav><button class="md:hidden text-white" onclick="toggleMobileMenu()"> <i class="fas fa-bars text-xl"></i> </button>
+    </div>
+   </div>
+  </header><!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden bg-slate-800 text-white p-4 md:hidden"><button onclick="showSection('home')" class="block w-full text-left py-2 hover:text-orange-400">Início</button> <button onclick="showSection('properties')" class="block w-full text-left py-2 hover:text-orange-400">Imóveis</button> <button onclick="showSection('broker')" class="block w-full text-left py-2 hover:text-orange-400">Painel Corretor</button> <button onclick="showSection('simulator')" class="block w-full text-left py-2 hover:text-orange-400">Simulador</button>
+  </div><!-- Main Content -->
+  <main class="container mx-auto px-4 py-8"><!-- Home Section -->
+   <section id="home-section" class="space-y-12"><!-- Hero -->
+    <div class="text-center space-y-6">
+     <h2 id="company-tagline" class="text-4xl md:text-6xl font-bold text-slate-800">Seu novo lar começa aqui</h2>
+     <p class="text-xl text-slate-600 max-w-2xl mx-auto">Com a OpenHouse, você encontra, compara e negocia imóveis com tecnologia e confiança.</p>
+    </div><!-- Search Bar -->
+    <div class="bg-white rounded-2xl shadow-xl p-6 max-w-4xl mx-auto">
+     <h3 class="text-2xl font-bold text-slate-800 mb-6 text-center">Encontre seu imóvel ideal</h3>
+     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"><select id="search-type" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"> <option value="">Tipo de imóvel</option> <option value="casa">Casa</option> <option value="apartamento">Apartamento</option> <option value="comercial">Comercial</option> <option value="terreno">Terreno</option> </select> <input type="text" id="search-location" placeholder="Localização" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"> <select id="search-bedrooms" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"> <option value="">Quartos</option> <option value="1">1 quarto</option> <option value="2">2 quartos</option> <option value="3">3 quartos</option> <option value="4">4+ quartos</option> </select> <select id="search-price" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"> <option value="">Faixa de preço</option> <option value="0-200000">Até R$ 200.000</option> <option value="200000-500000">R$ 200.000 - R$ 500.000</option> <option value="500000-1000000">R$ 500.000 - R$ 1.000.000</option> <option value="1000000-999999999">Acima de R$ 1.000.000</option> </select>
+     </div><button onclick="searchProperties()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-lg transition-colors"> <i class="fas fa-search mr-2"></i>Buscar Imóveis </button>
+    </div><!-- Featured Properties -->
+    <div class="space-y-6">
+     <h3 class="text-3xl font-bold text-slate-800 text-center">Imóveis em Destaque</h3>
+     <div id="featured-properties" class="property-grid"><!-- Properties will be loaded here -->
+     </div>
+    </div><!-- Services -->
+    <div class="bg-white rounded-2xl shadow-xl p-8">
+     <h3 class="text-3xl font-bold text-slate-800 text-center mb-8">Nossos Serviços</h3>
+     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="text-center p-6 rounded-lg bg-slate-50"><i class="fas fa-home text-4xl text-blue-600 mb-4"></i>
+       <h4 class="text-xl font-bold mb-2">Compra e Venda</h4>
+       <p class="text-slate-600">Encontre o imóvel perfeito ou venda o seu com nossa assessoria completa.</p>
+      </div>
+      <div class="text-center p-6 rounded-lg bg-slate-50"><i class="fas fa-key text-4xl text-green-600 mb-4"></i>
+       <h4 class="text-xl font-bold mb-2">Locação Digital</h4>
+       <p class="text-slate-600">Alugue seu imóvel de forma rápida e segura com nossa plataforma digital.</p>
+      </div>
+      <div class="text-center p-6 rounded-lg bg-slate-50"><i class="fas fa-calculator text-4xl text-purple-600 mb-4"></i>
+       <h4 class="text-xl font-bold mb-2">Financiamento</h4>
+       <p class="text-slate-600">Simule e encontre as melhores condições de financiamento para seu imóvel.</p>
+      </div>
+     </div>
+    </div>
+   </section><!-- Properties Section -->
+   <section id="properties-section" class="hidden space-y-6">
+    <div class="flex justify-between items-center">
+     <h2 class="text-3xl font-bold text-slate-800">Todos os Imóveis</h2>
+     <div class="flex space-x-2"><button onclick="filterProperties('all')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Todos</button> <button onclick="filterProperties('casa')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Casas</button> <button onclick="filterProperties('apartamento')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Apartamentos</button> <button onclick="filterProperties('comercial')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Comercial</button>
+     </div>
+    </div>
+    <div id="all-properties" class="property-grid"><!-- All properties will be loaded here -->
+    </div>
+   </section><!-- Broker Panel Section -->
+   <section id="broker-section" class="hidden space-y-6">
+    <h2 class="text-3xl font-bold text-slate-800">Painel do Corretor</h2><!-- Add Property Form -->
+    <div class="bg-white rounded-2xl shadow-xl p-6">
+     <h3 class="text-2xl font-bold text-slate-800 mb-6">Cadastrar Novo Imóvel</h3>
+     <form id="property-form" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+       <div><label for="property-type" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Imóvel</label> <select id="property-type" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"> <option value="">Selecione o tipo</option> <option value="casa">Casa</option> <option value="apartamento">Apartamento</option> <option value="comercial">Comercial</option> <option value="terreno">Terreno</option> </select>
+       </div>
+       <div><label for="property-category" class="block text-sm font-medium text-gray-700 mb-1">Categoria</label> <select id="property-category" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"> <option value="">Selecione a categoria</option> <option value="venda">Venda</option> <option value="aluguel">Aluguel</option> <option value="lancamento">Lançamento</option> </select>
+       </div>
+      </div>
+      <div><label for="property-title" class="block text-sm font-medium text-gray-700 mb-1">Título do Imóvel</label> <input type="text" id="property-title" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ex: Casa moderna com 3 quartos">
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+       <div><label for="property-price" class="block text-sm font-medium text-gray-700 mb-1">Preço (R$)</label> <input type="number" id="property-price" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="350000">
+       </div>
+       <div><label for="property-bedrooms" class="block text-sm font-medium text-gray-700 mb-1">Quartos</label> <input type="number" id="property-bedrooms" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="3">
+       </div>
+       <div><label for="property-bathrooms" class="block text-sm font-medium text-gray-700 mb-1">Banheiros</label> <input type="number" id="property-bathrooms" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="2">
+       </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+       <div><label for="property-area" class="block text-sm font-medium text-gray-700 mb-1">Área (m²)</label> <input type="number" id="property-area" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="120">
+       </div>
+       <div><label for="property-location" class="block text-sm font-medium text-gray-700 mb-1">Localização</label> <input type="text" id="property-location" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Asa Norte, Brasília - DF">
+       </div>
+      </div>
+      <div><label for="property-description" class="block text-sm font-medium text-gray-700 mb-1">Descrição</label> <textarea id="property-description" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Descreva as características do imóvel..."></textarea>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+       <div><label for="contact-name" class="block text-sm font-medium text-gray-700 mb-1">Nome do Corretor</label> <input type="text" id="contact-name" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="João Silva">
+       </div>
+       <div><label for="contact-phone" class="block text-sm font-medium text-gray-700 mb-1">Telefone</label> <input type="tel" id="contact-phone" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="(61) 99999-9999">
+       </div>
+       <div><label for="contact-email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label> <input type="email" id="contact-email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="joao@openhouse.com.br">
+       </div>
+      </div><button type="submit" id="submit-property" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg transition-colors"> <i class="fas fa-plus mr-2"></i>Cadastrar Imóvel </button>
+     </form>
+    </div><!-- Broker Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+     <div class="bg-white rounded-lg shadow-lg p-6 text-center"><i class="fas fa-home text-3xl text-blue-600 mb-2"></i>
+      <h4 class="text-2xl font-bold text-slate-800" id="total-properties">0</h4>
+      <p class="text-slate-600">Imóveis Cadastrados</p>
+     </div>
+     <div class="bg-white rounded-lg shadow-lg p-6 text-center"><i class="fas fa-eye text-3xl text-green-600 mb-2"></i>
+      <h4 class="text-2xl font-bold text-slate-800" id="total-views">0</h4>
+      <p class="text-slate-600">Visualizações</p>
+     </div>
+     <div class="bg-white rounded-lg shadow-lg p-6 text-center"><i class="fas fa-handshake text-3xl text-purple-600 mb-2"></i>
+      <h4 class="text-2xl font-bold text-slate-800" id="total-leads">0</h4>
+      <p class="text-slate-600">Leads Gerados</p>
+     </div>
+    </div>
+   </section><!-- Simulator Section -->
+   <section id="simulator-section" class="hidden space-y-6">
+    <h2 class="text-3xl font-bold text-slate-800">Simulador de Financiamento</h2>
+    <div class="bg-white rounded-2xl shadow-xl p-6 max-w-2xl mx-auto">
+     <h3 class="text-2xl font-bold text-slate-800 mb-6 text-center">Calcule suas parcelas</h3>
+     <div class="space-y-4">
+      <div><label for="loan-amount" class="block text-sm font-medium text-gray-700 mb-1">Valor do Imóvel (R$)</label> <input type="number" id="loan-amount" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="350000" oninput="calculateLoan()">
+      </div>
+      <div><label for="down-payment" class="block text-sm font-medium text-gray-700 mb-1">Entrada (R$)</label> <input type="number" id="down-payment" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="70000" oninput="calculateLoan()">
+      </div>
+      <div><label for="loan-term" class="block text-sm font-medium text-gray-700 mb-1">Prazo (anos)</label> <select id="loan-term" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" onchange="calculateLoan()"> <option value="10">10 anos</option> <option value="15">15 anos</option> <option value="20">20 anos</option> <option value="25">25 anos</option> <option value="30" selected>30 anos</option> <option value="35">35 anos</option> </select>
+      </div>
+      <div><label for="interest-rate" class="block text-sm font-medium text-gray-700 mb-1">Taxa de Juros (% ao ano)</label> <input type="number" id="interest-rate" step="0.01" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="8.5" oninput="calculateLoan()">
+      </div>
+     </div>
+     <div id="loan-results" class="mt-8 p-6 bg-slate-50 rounded-lg hidden">
+      <h4 class="text-xl font-bold text-slate-800 mb-4">Resultado da Simulação</h4>
+      <div class="space-y-2">
+       <div class="flex justify-between"><span class="text-slate-600">Valor financiado:</span> <span class="font-bold" id="financed-amount">R$ 0,00</span>
+       </div>
+       <div class="flex justify-between"><span class="text-slate-600">Parcela mensal:</span> <span class="font-bold text-green-600 text-xl" id="monthly-payment">R$ 0,00</span>
+       </div>
+       <div class="flex justify-between"><span class="text-slate-600">Total a pagar:</span> <span class="font-bold" id="total-payment">R$ 0,00</span>
+       </div>
+       <div class="flex justify-between"><span class="text-slate-600">Total de juros:</span> <span class="font-bold text-red-600" id="total-interest">R$ 0,00</span>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section>
+  </main><!-- Chatbot -->
+  <div id="chatbot" class="fixed bottom-6 right-6 z-50"><button onclick="toggleChat()" class="bg-orange-500 hover:bg-orange-600 text-white rounded-full p-4 shadow-lg chat-bubble"> <i class="fas fa-comments text-xl"></i> </button>
+   <div id="chat-window" class="hidden absolute bottom-16 right-0 w-80 bg-white rounded-lg shadow-xl border">
+    <div class="bg-orange-500 text-white p-4 rounded-t-lg">
+     <h4 class="font-bold">Assistente OpenHouse</h4>
+     <p class="text-sm opacity-90">Como posso ajudar?</p>
+    </div>
+    <div id="chat-messages" class="p-4 h-64 overflow-y-auto space-y-2">
+     <div class="bg-gray-100 p-3 rounded-lg">
+      <p class="text-sm">Olá! Sou o assistente virtual da OpenHouse. Posso ajudar com:</p>
+      <ul class="text-sm mt-2 space-y-1">
+       <li>• Busca de imóveis</li>
+       <li>• Informações sobre financiamento</li>
+       <li>• Contato com corretores</li>
+       <li>• Dúvidas gerais</li>
+      </ul>
+     </div>
+    </div>
+    <div class="p-4 border-t">
+     <div class="flex space-x-2"><input type="text" id="chat-input" placeholder="Digite sua mensagem..." class="flex-1 p-2 border border-gray-300 rounded-lg text-sm" onkeypress="handleChatKeyPress(event)"> <button onclick="sendChatMessage()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg"> <i class="fas fa-paper-plane"></i> </button>
+     </div>
+    </div>
+   </div>
+  </div><!-- Property Detail Modal -->
+  <div id="property-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal z-50 flex items-center justify-center p-4">
+   <div class="bg-white rounded-2xl max-w-2xl w-full max-h-full overflow-y-auto">
+    <div class="p-6">
+     <div class="flex justify-between items-start mb-4">
+      <h3 id="modal-title" class="text-2xl font-bold text-slate-800"></h3><button onclick="closePropertyModal()" class="text-gray-500 hover:text-gray-700"> <i class="fas fa-times text-xl"></i> </button>
+     </div>
+     <div id="modal-content" class="space-y-4"><!-- Modal content will be populated here -->
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+        // Global variables
+        let currentProperties = [];
+        let currentFilter = 'all';
+        let chatOpen = false;
+        
+        // Default configuration
+        const defaultConfig = {
+            company_name: "OpenHouse",
+            company_tagline: "Seu novo lar começa aqui",
+            contact_phone: "(61) 99999-9999",
+            contact_email: "contato@openhouse.com.br",
+            primary_color: "#003F5C",
+            secondary_color: "#F2A154",
+            text_color: "#1E293B",
+            background_color: "#F8FAFC",
+            surface_color: "#FFFFFF"
+        };
+
+        // Sample properties data
+        const sampleProperties = [
+            {
+                id: "1",
+                type: "casa",
+                category: "venda",
+                title: "Casa Moderna com Piscina",
+                price: 850000,
+                location: "Lago Sul, Brasília - DF",
+                bedrooms: 4,
+                bathrooms: 3,
+                area: 280,
+                description: "Linda casa moderna com piscina, churrasqueira e jardim. Localizada em condomínio fechado com segurança 24h.",
+                contact_name: "Maria Santos",
+                contact_phone: "(61) 98765-4321",
+                contact_email: "maria@openhouse.com.br",
+                created_at: new Date().toISOString(),
+                status: "disponivel"
+            },
+            {
+                id: "2",
+                type: "apartamento",
+                category: "aluguel",
+                title: "Apartamento 2 Quartos Asa Norte",
+                price: 2500,
+                location: "Asa Norte, Brasília - DF",
+                bedrooms: 2,
+                bathrooms: 2,
+                area: 85,
+                description: "Apartamento moderno e bem localizado, próximo ao metrô e comércio. Mobiliado e pronto para morar.",
+                contact_name: "João Silva",
+                contact_phone: "(61) 99876-5432",
+                contact_email: "joao@openhouse.com.br",
+                created_at: new Date().toISOString(),
+                status: "disponivel"
+            },
+            {
+                id: "3",
+                type: "comercial",
+                category: "venda",
+                title: "Sala Comercial Centro Empresarial",
+                price: 450000,
+                location: "Setor Comercial Sul, Brasília - DF",
+                bedrooms: 0,
+                bathrooms: 2,
+                area: 120,
+                description: "Excelente sala comercial em prédio moderno, com estacionamento e infraestrutura completa.",
+                contact_name: "Carlos Oliveira",
+                contact_phone: "(61) 97654-3210",
+                contact_email: "carlos@openhouse.com.br",
+                created_at: new Date().toISOString(),
+                status: "disponivel"
+            }
+        ];
+
+        // Data SDK handler
+        const dataHandler = {
+            onDataChanged(data) {
+                currentProperties = [...sampleProperties, ...data];
+                updatePropertyDisplays();
+                updateBrokerStats();
+            }
+        };
+
+        // Element SDK configuration
+        const elementConfig = {
+            defaultConfig,
+            onConfigChange: async (config) => {
+                // Update company name
+                const companyNameEl = document.getElementById('company-name');
+                if (companyNameEl) {
+                    companyNameEl.textContent = config.company_name || defaultConfig.company_name;
+                }
+                
+                // Update tagline
+                const taglineEl = document.getElementById('company-tagline');
+                if (taglineEl) {
+                    taglineEl.textContent = config.company_tagline || defaultConfig.company_tagline;
+                }
+                
+                // Update colors
+                const primaryColor = config.primary_color || defaultConfig.primary_color;
+                const secondaryColor = config.secondary_color || defaultConfig.secondary_color;
+                const textColor = config.text_color || defaultConfig.text_color;
+                const backgroundColor = config.background_color || defaultConfig.background_color;
+                const surfaceColor = config.surface_color || defaultConfig.surface_color;
+                
+                document.documentElement.style.setProperty('--primary-color', primaryColor);
+                document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+                document.documentElement.style.setProperty('--text-color', textColor);
+                document.documentElement.style.setProperty('--background-color', backgroundColor);
+                document.documentElement.style.setProperty('--surface-color', surfaceColor);
+            },
+            mapToCapabilities: (config) => ({
+                recolorables: [
+                    {
+                        get: () => config.primary_color || defaultConfig.primary_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ primary_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.secondary_color || defaultConfig.secondary_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ secondary_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.text_color || defaultConfig.text_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ text_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.background_color || defaultConfig.background_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ background_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.surface_color || defaultConfig.surface_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ surface_color: value });
+                            }
+                        }
+                    }
+                ],
+                borderables: [],
+                fontEditable: undefined,
+                fontSizeable: undefined
+            }),
+            mapToEditPanelValues: (config) => new Map([
+                ["company_name", config.company_name || defaultConfig.company_name],
+                ["company_tagline", config.company_tagline || defaultConfig.company_tagline],
+                ["contact_phone", config.contact_phone || defaultConfig.contact_phone],
+                ["contact_email", config.contact_email || defaultConfig.contact_email]
+            ])
+        };
+
+        // Initialize SDKs
+        async function initializeApp() {
+            try {
+                // Initialize Element SDK
+                if (window.elementSdk) {
+                    await window.elementSdk.init(elementConfig);
+                }
+                
+                // Initialize Data SDK
+                if (window.dataSdk) {
+                    const result = await window.dataSdk.init(dataHandler);
+                    if (!result.isOk) {
+                        console.error("Failed to initialize Data SDK");
+                    }
+                }
+                
+                // Initialize with sample data
+                currentProperties = [...sampleProperties];
+                updatePropertyDisplays();
+                updateBrokerStats();
+                
+            } catch (error) {
+                console.error("Failed to initialize app:", error);
+            }
+        }
+
+        // Navigation functions
+        function showSection(sectionName) {
+            // Hide all sections
+            const sections = ['home-section', 'properties-section', 'broker-section', 'simulator-section'];
+            sections.forEach(section => {
+                document.getElementById(section).classList.add('hidden');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName + '-section').classList.remove('hidden');
+            
+            // Close mobile menu
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Property functions
+        function updatePropertyDisplays() {
+            updateFeaturedProperties();
+            updateAllProperties();
+        }
+
+        function updateFeaturedProperties() {
+            const container = document.getElementById('featured-properties');
+            const featured = currentProperties.slice(0, 6);
+            
+            container.innerHTML = featured.map(property => createPropertyCard(property)).join('');
+        }
+
+        function updateAllProperties() {
+            const container = document.getElementById('all-properties');
+            let filtered = currentProperties;
+            
+            if (currentFilter !== 'all') {
+                filtered = currentProperties.filter(p => p.type === currentFilter);
+            }
+            
+            container.innerHTML = filtered.map(property => createPropertyCard(property)).join('');
+        }
+
+        function createPropertyCard(property) {
+            const formattedPrice = new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(property.price);
+            
+            const categoryBadge = property.category === 'venda' ? 'bg-green-100 text-green-800' : 
+                                 property.category === 'aluguel' ? 'bg-blue-100 text-blue-800' : 
+                                 'bg-purple-100 text-purple-800';
+            
+            return `
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover">
+                    <div class="h-48 bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
+                        <i class="fas fa-${property.type === 'casa' ? 'home' : property.type === 'apartamento' ? 'building' : property.type === 'comercial' ? 'briefcase' : 'map'} text-4xl text-slate-500"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full ${categoryBadge}">
+                                ${property.category.charAt(0).toUpperCase() + property.category.slice(1)}
+                            </span>
+                            <button onclick="toggleFavorite('${property.id}')" class="text-gray-400 hover:text-red-500">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-800 mb-2">${property.title}</h4>
+                        <p class="text-2xl font-bold text-green-600 mb-2">${formattedPrice}</p>
+                        <p class="text-slate-600 mb-3"><i class="fas fa-map-marker-alt mr-1"></i>${property.location}</p>
+                        <div class="flex justify-between text-sm text-slate-600 mb-4">
+                            ${property.bedrooms > 0 ? `<span><i class="fas fa-bed mr-1"></i>${property.bedrooms} quartos</span>` : ''}
+                            <span><i class="fas fa-bath mr-1"></i>${property.bathrooms} banheiros</span>
+                            <span><i class="fas fa-ruler-combined mr-1"></i>${property.area}m²</span>
+                        </div>
+                        <button onclick="showPropertyDetails('${property.id}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                            Ver Detalhes
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function searchProperties() {
+            const type = document.getElementById('search-type').value;
+            const location = document.getElementById('search-location').value.toLowerCase();
+            const bedrooms = document.getElementById('search-bedrooms').value;
+            const priceRange = document.getElementById('search-price').value;
+            
+            let filtered = currentProperties;
+            
+            if (type) {
+                filtered = filtered.filter(p => p.type === type);
+            }
+            
+            if (location) {
+                filtered = filtered.filter(p => p.location.toLowerCase().includes(location));
+            }
+            
+            if (bedrooms) {
+                filtered = filtered.filter(p => p.bedrooms >= parseInt(bedrooms));
+            }
+            
+            if (priceRange) {
+                const [min, max] = priceRange.split('-').map(Number);
+                filtered = filtered.filter(p => p.price >= min && p.price <= max);
+            }
+            
+            // Show results in properties section
+            showSection('properties');
+            const container = document.getElementById('all-properties');
+            container.innerHTML = filtered.map(property => createPropertyCard(property)).join('');
+        }
+
+        function filterProperties(type) {
+            currentFilter = type;
+            updateAllProperties();
+            
+            // Update filter buttons
+            const buttons = document.querySelectorAll('#properties-section button');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            event.target.classList.add('bg-blue-600', 'text-white');
+        }
+
+        function showPropertyDetails(propertyId) {
+            const property = currentProperties.find(p => p.id === propertyId);
+            if (!property) return;
+            
+            const formattedPrice = new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(property.price);
+            
+            document.getElementById('modal-title').textContent = property.title;
+            document.getElementById('modal-content').innerHTML = `
+                <div class="space-y-4">
+                    <div class="h-64 bg-gradient-to-br from-slate-200 to-slate-300 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-${property.type === 'casa' ? 'home' : property.type === 'apartamento' ? 'building' : property.type === 'comercial' ? 'briefcase' : 'map'} text-6xl text-slate-500"></i>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center p-4 bg-slate-50 rounded-lg">
+                            <i class="fas fa-tag text-2xl text-green-600 mb-2"></i>
+                            <p class="text-2xl font-bold text-green-600">${formattedPrice}</p>
+                            <p class="text-sm text-slate-600">${property.category}</p>
+                        </div>
+                        <div class="text-center p-4 bg-slate-50 rounded-lg">
+                            <i class="fas fa-map-marker-alt text-2xl text-blue-600 mb-2"></i>
+                            <p class="font-bold text-slate-800">${property.location}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-4">
+                        ${property.bedrooms > 0 ? `
+                        <div class="text-center p-3 bg-slate-50 rounded-lg">
+                            <i class="fas fa-bed text-xl text-purple-600 mb-1"></i>
+                            <p class="font-bold">${property.bedrooms}</p>
+                            <p class="text-xs text-slate-600">Quartos</p>
+                        </div>` : ''}
+                        <div class="text-center p-3 bg-slate-50 rounded-lg">
+                            <i class="fas fa-bath text-xl text-blue-600 mb-1"></i>
+                            <p class="font-bold">${property.bathrooms}</p>
+                            <p class="text-xs text-slate-600">Banheiros</p>
+                        </div>
+                        <div class="text-center p-3 bg-slate-50 rounded-lg">
+                            <i class="fas fa-ruler-combined text-xl text-orange-600 mb-1"></i>
+                            <p class="font-bold">${property.area}m²</p>
+                            <p class="text-xs text-slate-600">Área</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-bold text-slate-800 mb-2">Descrição</h4>
+                        <p class="text-slate-600">${property.description}</p>
+                    </div>
+                    
+                    <div class="bg-slate-50 p-4 rounded-lg">
+                        <h4 class="font-bold text-slate-800 mb-2">Contato do Corretor</h4>
+                        <div class="space-y-2">
+                            <p><i class="fas fa-user mr-2"></i><strong>${property.contact_name}</strong></p>
+                            <p><i class="fas fa-phone mr-2"></i>${property.contact_phone}</p>
+                            <p><i class="fas fa-envelope mr-2"></i>${property.contact_email}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button onclick="contactBroker('${property.id}')" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                            <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                        </button>
+                        <button onclick="scheduleVisit('${property.id}')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                            <i class="fas fa-calendar mr-2"></i>Agendar Visita
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('property-modal').classList.remove('hidden');
+        }
+
+        function closePropertyModal() {
+            document.getElementById('property-modal').classList.add('hidden');
+        }
+
+        function toggleFavorite(propertyId) {
+            // Toggle favorite functionality
+            const heartIcon = event.target;
+            if (heartIcon.classList.contains('far')) {
+                heartIcon.classList.remove('far');
+                heartIcon.classList.add('fas', 'text-red-500');
+            } else {
+                heartIcon.classList.remove('fas', 'text-red-500');
+                heartIcon.classList.add('far');
+            }
+        }
+
+        function contactBroker(propertyId) {
+            const property = currentProperties.find(p => p.id === propertyId);
+            if (property) {
+                const message = `Olá! Tenho interesse no imóvel: ${property.title} - ${property.location}`;
+                const phone = property.contact_phone.replace(/\D/g, '');
+                window.open(`https://wa.me/55${phone}?text=${encodeURIComponent(message)}`, '_blank');
+            }
+        }
+
+        function scheduleVisit(propertyId) {
+            const property = currentProperties.find(p => p.id === propertyId);
+            if (property) {
+                // Show inline confirmation instead of alert
+                const modalContent = document.getElementById('modal-content');
+                const confirmDiv = document.createElement('div');
+                confirmDiv.className = 'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4';
+                confirmDiv.innerHTML = `
+                    <p><i class="fas fa-check-circle mr-2"></i>Solicitação de visita enviada! O corretor ${property.contact_name} entrará em contato em breve.</p>
+                `;
+                modalContent.insertBefore(confirmDiv, modalContent.firstChild);
+                
+                // Remove confirmation after 3 seconds
+                setTimeout(() => {
+                    confirmDiv.remove();
+                }, 3000);
+            }
+        }
+
+        // Broker panel functions
+        async function handlePropertySubmission(event) {
+            event.preventDefault();
+            
+            if (currentProperties.length >= 999) {
+                showToast('Limite máximo de 999 imóveis atingido. Exclua alguns imóveis primeiro.', 'error');
+                return;
+            }
+            
+            const submitButton = document.getElementById('submit-property');
+            const originalText = submitButton.innerHTML;
+            
+            // Show loading state
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Cadastrando...';
+            submitButton.disabled = true;
+            
+            try {
+                const formData = {
+                    id: Date.now().toString(),
+                    type: document.getElementById('property-type').value,
+                    category: document.getElementById('property-category').value,
+                    title: document.getElementById('property-title').value,
+                    price: parseFloat(document.getElementById('property-price').value),
+                    location: document.getElementById('property-location').value,
+                    bedrooms: parseInt(document.getElementById('property-bedrooms').value),
+                    bathrooms: parseInt(document.getElementById('property-bathrooms').value),
+                    area: parseFloat(document.getElementById('property-area').value),
+                    description: document.getElementById('property-description').value,
+                    contact_name: document.getElementById('contact-name').value,
+                    contact_phone: document.getElementById('contact-phone').value,
+                    contact_email: document.getElementById('contact-email').value,
+                    created_at: new Date().toISOString(),
+                    status: 'disponivel'
+                };
+                
+                if (window.dataSdk) {
+                    const result = await window.dataSdk.create(formData);
+                    
+                    if (result.isOk) {
+                        showToast('Imóvel cadastrado com sucesso!', 'success');
+                        document.getElementById('property-form').reset();
+                    } else {
+                        showToast('Erro ao cadastrar imóvel. Tente novamente.', 'error');
+                    }
+                } else {
+                    // Fallback for when SDK is not available
+                    currentProperties.push(formData);
+                    updatePropertyDisplays();
+                    updateBrokerStats();
+                    showToast('Imóvel cadastrado com sucesso!', 'success');
+                    document.getElementById('property-form').reset();
+                }
+                
+            } catch (error) {
+                showToast('Erro ao cadastrar imóvel. Tente novamente.', 'error');
+            } finally {
+                // Reset button state
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+            }
+        }
+
+        function updateBrokerStats() {
+            document.getElementById('total-properties').textContent = currentProperties.length;
+            document.getElementById('total-views').textContent = Math.floor(Math.random() * 1000) + 500;
+            document.getElementById('total-leads').textContent = Math.floor(Math.random() * 50) + 25;
+        }
+
+        // Loan calculator functions
+        function calculateLoan() {
+            const loanAmount = parseFloat(document.getElementById('loan-amount').value) || 0;
+            const downPayment = parseFloat(document.getElementById('down-payment').value) || 0;
+            const loanTerm = parseInt(document.getElementById('loan-term').value) || 30;
+            const interestRate = parseFloat(document.getElementById('interest-rate').value) || 8.5;
+            
+            if (loanAmount <= 0) {
+                document.getElementById('loan-results').classList.add('hidden');
+                return;
+            }
+            
+            const financedAmount = loanAmount - downPayment;
+            const monthlyRate = interestRate / 100 / 12;
+            const numPayments = loanTerm * 12;
+            
+            let monthlyPayment = 0;
+            if (monthlyRate > 0) {
+                monthlyPayment = financedAmount * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
+            } else {
+                monthlyPayment = financedAmount / numPayments;
+            }
+            
+            const totalPayment = monthlyPayment * numPayments;
+            const totalInterest = totalPayment - financedAmount;
+            
+            // Update results
+            document.getElementById('financed-amount').textContent = formatCurrency(financedAmount);
+            document.getElementById('monthly-payment').textContent = formatCurrency(monthlyPayment);
+            document.getElementById('total-payment').textContent = formatCurrency(totalPayment);
+            document.getElementById('total-interest').textContent = formatCurrency(totalInterest);
+            
+            document.getElementById('loan-results').classList.remove('hidden');
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(amount);
+        }
+
+        // Chatbot functions
+        function toggleChat() {
+            chatOpen = !chatOpen;
+            const chatWindow = document.getElementById('chat-window');
+            
+            if (chatOpen) {
+                chatWindow.classList.remove('hidden');
+            } else {
+                chatWindow.classList.add('hidden');
+            }
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            const messagesContainer = document.getElementById('chat-messages');
+            
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'bg-blue-500 text-white p-3 rounded-lg ml-8';
+            userMessage.innerHTML = `<p class="text-sm">${message}</p>`;
+            messagesContainer.appendChild(userMessage);
+            
+            // Clear input
+            input.value = '';
+            
+            // Simulate bot response
+            setTimeout(() => {
+                const botResponse = getBotResponse(message.toLowerCase());
+                const botMessage = document.createElement('div');
+                botMessage.className = 'bg-gray-100 p-3 rounded-lg mr-8';
+                botMessage.innerHTML = `<p class="text-sm">${botResponse}</p>`;
+                messagesContainer.appendChild(botMessage);
+                
+                // Scroll to bottom
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1000);
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function getBotResponse(message) {
+            if (message.includes('casa') || message.includes('imóvel') || message.includes('comprar')) {
+                return 'Temos várias opções de casas disponíveis! Use nossa busca inteligente na página inicial para encontrar o imóvel ideal. Posso ajudar com alguma característica específica?';
+            } else if (message.includes('financiamento') || message.includes('parcela')) {
+                return 'Nosso simulador de financiamento pode ajudar! Acesse a aba "Simulador" para calcular suas parcelas. Trabalhamos com as melhores taxas do mercado.';
+            } else if (message.includes('corretor') || message.includes('contato')) {
+                return 'Nossos corretores estão prontos para atender! Você pode entrar em contato através do WhatsApp ou agendar uma visita diretamente nos detalhes do imóvel.';
+            } else if (message.includes('aluguel') || message.includes('alugar')) {
+                return 'Temos ótimas opções para aluguel! Use os filtros de busca e selecione "Aluguel" para ver apenas imóveis disponíveis para locação.';
+            } else {
+                return 'Obrigado pela sua mensagem! Posso ajudar com informações sobre imóveis, financiamento ou colocar você em contato com nossos corretores. Como posso ajudar?';
+            }
+        }
+
+        // Utility functions
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg text-white ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 
+                'bg-blue-500'
+            }`;
+            toast.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeApp();
+            
+            // Add form event listener
+            document.getElementById('property-form').addEventListener('submit', handlePropertySubmission);
+            
+            // Close modal when clicking outside
+            document.getElementById('property-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'property-modal') {
+                    closePropertyModal();
+                }
+            });
+        });
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9967be1784d87dfa',t:'MTc2MTc5NDA2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
